@@ -7,22 +7,23 @@ from classes.train import Train
 
 def main():
     game = Game((800, 600), 60)
+    image = pygame.image.load("images/train.png")
 
     start_node = Node(400, 400)
     end_node = Node(200, 400)
     track = Track((100, 255, 100), start_node, end_node)
 
-    train = Train(start_node.get(), track)
+    train = Train(start_node.get(), track, image)
 
     start_node2 = Node(200, 200)
     end_node2 = Node(200, 100)
     track2 = Track((255, 100, 100), start_node2, end_node2)
-    train2 = Train(start_node2.get(), track2)
+    train2 = Train(start_node2.get(), track2, image)
 
     start_node3 = Node(100, 400)
     end_node3 = Node(200, 500)
     track3 = Track((255, 100, 255), start_node3, end_node3)
-    train3 = Train(start_node3.get(), track3)
+    train3 = Train(start_node3.get(), track3, image)
 
 
     node1 = Node(500, 100)
@@ -53,7 +54,7 @@ def main():
     track7.connected_with_end.append(track4)
     track4.connected_with_start.append(track7)
 
-    train4 = Train(track4.start_node.get(), track4)
+    train4 = Train(track4.start_node.get(), track4, image)
 
     tracks = [track, track2, track3, track4, track5, track6, track7]
     trains = [train, train2, train3, train4]
