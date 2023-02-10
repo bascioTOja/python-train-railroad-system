@@ -34,8 +34,8 @@ class Train:
             self.set_next_track()
 
     def draw(self, win):
+        pygame.draw.circle(win, self.color if self.running else self.not_running_color, (self.rect.center[0], self.rect.center[1]), self.width//2)
         win.blit(self.rotated_image, self.rect)
-        pygame.draw.rect(win, self.color if self.running else self.not_running_color, (self.rect.center[0]-self.width//4, self.rect.center[1]-self.width//4, self.width//2, self.width//2))
 
     def set_next_track(self):
         next_track = self.track.get_next_track(self.target_node)
@@ -55,3 +55,5 @@ class Train:
         offset = self.speed/60/2  # 60 fps
         if ((self.x - offset) <= self.target_node.x <= (self.x + offset)) and ((self.y - offset) <= self.target_node.y <= (self.y + offset)):
             self.running = False
+        else:
+            self.running = True
