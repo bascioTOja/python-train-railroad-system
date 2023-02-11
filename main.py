@@ -1,52 +1,40 @@
 import pygame
 
 from classes.game import Game
-from classes.track import Track
 from classes.node import Node
+from classes.track import Track
 from classes.train import Train
+from classes.track_controller import TrackController
 
 def main():
     game = Game((800, 600), 60)
     image = pygame.image.load("images/train.png")
 
-    start_node = Node(400, 400)
-    end_node = Node(200, 400)
-    track = Track((100, 255, 100), start_node, end_node)
+    track_controller = TrackController()
 
-    train = Train(start_node.get(), track, image)
+    track = Track((100, 255, 100), Node(400, 400), Node(200, 400))
 
-    start_node2 = Node(200, 200)
-    end_node2 = Node(200, 100)
-    track2 = Track((255, 100, 100), start_node2, end_node2)
-    train2 = Train(start_node2.get(), track2, image)
+    train = Train(track.start_node.get(), track, image)
 
-    start_node3 = Node(100, 400)
-    end_node3 = Node(200, 500)
-    track3 = Track((255, 100, 255), start_node3, end_node3)
-    train3 = Train(start_node3.get(), track3, image)
+    track2 = Track((255, 100, 100), Node(200, 200), Node(200, 100))
+    train2 = Train(track2.start_node.get(), track2, image)
+
+    track3 = Track((255, 100, 255), Node(100, 400), Node(200, 500))
+    train3 = Train(track3.start_node.get(), track3, image)
 
 
-    node1 = Node(500, 100)
-    node2 = Node(600, 200)
-    track4 = Track((150, 150, 150), node1, node2)
-
-    node3 = Node(600, 200)
-    node4 = Node(500, 300)
-    track5 = Track((150, 150, 150), node3, node4)
+    track4 = Track((150, 150, 150), Node(500, 100), Node(600, 200))
+    track5 = Track((150, 150, 150), Node(600, 200), Node(500, 300))
 
     track4.connected_with_end.append(track5)
     track5.connected_with_start.append(track4)
 
-    node5 = Node(500, 300)
-    node6 = Node(400, 200)
-    track6 = Track((150, 150, 150), node5, node6)
+    track6 = Track((150, 150, 150), Node(500, 300), Node(400, 200))
 
     track5.connected_with_end.append(track6)
     track6.connected_with_start.append(track5)
 
-    node7 = Node(400, 200)
-    node8 = Node(500, 100)
-    track7 = Track((150, 150, 150), node7, node8)
+    track7 = Track((150, 150, 150), Node(400, 200), Node(500, 100))
 
     track6.connected_with_end.append(track7)
     track7.connected_with_start.append(track6)
@@ -56,20 +44,20 @@ def main():
 
     train4 = Train(track4.start_node.get(), track4, image)
 
-    tracks = [track, track2, track3, track4, track5, track6, track7]
+    track_controller.tracks.extend([track, track2, track3, track4, track5, track6, track7])
     trains = [train, train2, train3, train4]
 
     while game.run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.run = False
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     if event.button == 1:
-            #         pos = pygame.mouse.get_pos()
-            #         for point in spline.points:
-            #             if point.rect.collidepoint(pos):
-            #                 selected_point = point
-            #                 break
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    track_controller.add_node(pos)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    track_controller.create_track()
             # elif event.type == pygame.MOUSEBUTTONUP:
             #     if event.button == 1:
             #         selected_point = None
@@ -84,7 +72,7 @@ def main():
             #         selected_point.rect.x, selected_point.rect.y = selected_point.x - selected_point.size // 2, selected_point.y - selected_point.size // 2
 
         game.update(*trains)
-        game.draw(*tracks, *trains)
+        game.draw(track_controller, *trains)
         game.clock.tick(game.fps)
 
 pygame.quit()
