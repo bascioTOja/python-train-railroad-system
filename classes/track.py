@@ -25,14 +25,13 @@ class Track:
         if current_node is self.start_node:
             if tracks := [track for track in self.connected_with_start if not track.block]:
                 return choice(tracks)
-        else:
-            if tracks := [track for track in self.connected_with_end if not track.block]:
-                return choice(tracks)
+        elif tracks := [track for track in self.connected_with_end if not track.block]:
+            return choice(tracks)
 
         return None
 
     def connect_track(self, track):
-        # todo fix connect tracks
+        # TODO: Fix connect tracks
         if self.start_node.get() == track.start_node.get():
             self.connect_with_start(track)
 

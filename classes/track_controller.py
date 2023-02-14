@@ -18,9 +18,9 @@ class TrackController:
         for track in self.tracks:
             track.draw(win)
 
-        if not (self.first_node is None):
+        if self.first_node is not None:
             self.first_node.draw(win)
-        if not (self.second_node is None):
+        if self.second_node is not None:
             self.second_node.draw(win)
 
     def create_track(self):

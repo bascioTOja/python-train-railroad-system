@@ -24,8 +24,8 @@ class Train:
         if self.running:
             angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
 
-            self.x, self.y = (self.x + math.cos(angle) / (game.fps if not game is None else 60) * self.speed,
-                             self.y + math.sin(angle) / (game.fps if not game is None else 60) * self.speed)
+            self.x, self.y = (self.x + math.cos(angle) / (game.fps if game is not None else 60) * self.speed,
+                            self.y + math.sin(angle) / (game.fps if game is not None else 60) * self.speed)
 
             rotation = math.degrees(-angle)
             self.rotated_image = pygame.transform.rotate(self.image, rotation-90)
