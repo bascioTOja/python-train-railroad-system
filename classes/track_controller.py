@@ -3,6 +3,11 @@ from random import randint
 from classes.node import Node
 from classes.track import Track
 
+
+def connect_tracks(track_one: Track, track_two: Track):
+    track_one.connect_track(track_two)
+    track_two.connect_track(track_one)
+
 class TrackController:
     blueprint_color = (120, 120, 255)
     tracks = []
@@ -31,8 +36,8 @@ class TrackController:
             new_track = Track((randint(20, 255), randint(20, 255), randint(20, 255)), self.first_node, self.second_node)
             self.tracks.append(new_track)
 
-            for track in self.get_tracks_in_position(new_track.start_node.get(), new_track.end_node.get()):
-                self.connect_tracks(track, new_track)
+            for track in self.get_tracks_in_position(new_track.start_node.get(), new_track.end_node.get(), with_out_track=new_track):
+                connect_tracks(track, new_track)
 
         self.first_node = None
         self.second_node = None
@@ -72,9 +77,5 @@ class TrackController:
 
         return nodes
 
-    def get_tracks_in_position(self, *positions):
-        return [track for track in self.tracks if len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
-
-    def connect_tracks(self, track_one: Track, track_two: Track):
-        track_one.connect_track(track_two)
-        track_two.connect_track(track_one)
+    def get_tracks_in_position(self, *positions, with_out_track=None):
+        return [track for track in self.tracks if (track is not with_out_track) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]

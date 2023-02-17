@@ -31,7 +31,6 @@ class Track:
         return None
 
     def connect_track(self, track):
-        # TODO: Fix connect tracks
         if self.start_node.get() == track.start_node.get():
             self.connect_with_start(track)
 
