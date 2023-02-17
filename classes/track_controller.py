@@ -52,6 +52,16 @@ class TrackController:
 
         self.first_select = not self.first_select
 
+    def remove_node(self, pos):
+        pos = self.snap_pos_to_node(pos)
+        to_delete = self.get_tracks_in_position(pos, include_blocked=False)
+
+        for track in to_delete:
+            track.delete()
+
+        self.tracks = [track for track in self.tracks if track not in to_delete]
+
+
     def snap_pos_to_node(self, pos):
         if (node := self.get_first_node_in_position(pos)) is not None:
             return node.get()
@@ -77,5 +87,5 @@ class TrackController:
 
         return nodes
 
-    def get_tracks_in_position(self, *positions, with_out_track=None):
-        return [track for track in self.tracks if (track is not with_out_track) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
+    def get_tracks_in_position(self, *positions, with_out_track=None, include_blocked=True, get_index=False):
+        return [index if get_index else track for index, track in enumerate(self.tracks) if (track is not with_out_track) and (include_blocked or not track.block) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]

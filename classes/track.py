@@ -30,6 +30,13 @@ class Track:
 
         return None
 
+    def delete(self):
+        for track in self.connected_with_start:
+            track.disconnect_track(self)
+
+        for track in self.connected_with_end:
+            track.disconnect_track(self)
+
     def connect_track(self, track):
         if self.start_node.get() == track.start_node.get():
             self.connect_with_start(track)
@@ -42,6 +49,10 @@ class Track:
 
         if self.end_node.get() == track.end_node.get():
             self.connect_with_end(track)
+
+    def disconnect_track(self, track):
+        self.connected_with_start = [connected_track for connected_track in self.connected_with_start if connected_track is not track]
+        self.connected_with_end = [connected_track for connected_track in self.connected_with_end if connected_track is not track]
 
     def connect_with_start(self, track):
         self.connected_with_start.append(track)

@@ -51,10 +51,14 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     pos = pygame.mouse.get_pos()
                     track_controller.add_node(pos)
+                elif event.button == 3:
+                    pos = pygame.mouse.get_pos()
+                    track_controller.remove_node(pos)
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     track_controller.create_track()
