@@ -21,6 +21,7 @@ class Train:
 
     def update(self, game = None):
         self.check_end_track()
+        self.track.block = True
         if self.running:
             angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
 
@@ -47,7 +48,9 @@ class Train:
         if next_node is None:
             return None
 
+        self.track.block = False
         self.track = next_track
+        self.track.block = True
         self.target_node = next_node
         self.running = True
 
