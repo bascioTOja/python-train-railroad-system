@@ -7,7 +7,7 @@ from classes.train import Train
 from classes.track_controller import TrackController
 
 def main():
-    game = Game((800, 600), 60)
+    game = Game(size=(800, 600), fps=60)
     image = pygame.image.load("images/train.png")
 
     track_controller = TrackController()

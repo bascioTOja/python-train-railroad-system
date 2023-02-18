@@ -1,50 +1,61 @@
 import pygame
 import math
+from dataclasses import dataclass
 
+from classes.track import Track
+from classes.game import Game
+
+@dataclass
 class Train:
-    not_running_color = (255, 0, 0)
+    position: tuple[int, int]
+    track: Track
+    image: pygame.Surface
+    speed: int = 75
+    color: tuple[int, int, int] = (125, 255, 170)
+    not_running_color: tuple[int, int, int] = (255, 0, 0)
+    running: bool = True
 
-    def __init__(self, position, track, image):
-        self.x = position[0]
-        self.y = position[1]
-        self.image = image
-        self.speed = 75
-        self.width = self.image.get_rect().width
-        self.height = self.image.get_rect().height
-        self.color = (125, 255, 170)
-        self.track = track
-        self.target_node = track.end_node
-        self.rotated_image = None
-        self.rect = None
-        self.running = True
-        self.update()
+    angle = 0
+    rotation = 0
 
-    def update(self, game = None):
+    def __post_init__(self):
+        self.x, self.y = self.position
+        self.width, self.height = self.image.get_size()
+        self.target_node = self.track.end_node
+
+        self.update_position(None)
+        self.update_rotation()
+
+    def update(self, game: Game = None) -> None:
         self.check_end_track()
         self.track.block = True
         if self.running:
-            angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
-
-            self.x, self.y = (self.x + math.cos(angle) / (game.fps if game is not None else 60) * self.speed,
-                            self.y + math.sin(angle) / (game.fps if game is not None else 60) * self.speed)
-
-            rotation = math.degrees(-angle)
-            self.rotated_image = pygame.transform.rotate(self.image, rotation-90)
-            self.rect = self.rotated_image.get_rect(center=(self.x, self.y))
+            self.update_position(game)
+            self.update_rotation()
         else:
             self.set_next_track()
 
-    def draw(self, win):
-        pygame.draw.circle(win, self.color if self.running else self.not_running_color, (self.rect.center[0], self.rect.center[1]), self.width//2)
+    def update_position(self, game: Game | None):
+        self.angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
+        delta_time = game.fps if game is not None else 60
+        self.x += math.cos(self.angle) / delta_time * self.speed
+        self.y += math.sin(self.angle) / delta_time * self.speed
+
+    def update_rotation(self):
+        self.rotation = math.degrees(-self.angle) - 90
+        self.rotated_image = pygame.transform.rotate(self.image, self.rotation)
+        self.rect = self.rotated_image.get_rect(center=(self.x, self.y))
+
+    def draw(self, win: pygame.Surface) -> None:
+        pygame.draw.circle(win, self.color if self.running else self.not_running_color, self.rect.center, self.width//2)
         win.blit(self.rotated_image, self.rect)
 
-    def set_next_track(self):
+    def set_next_track(self) -> None:
         next_track = self.track.get_next_track(self.target_node)
         if next_track is None:
             return None
 
         next_node = next_track.get_new_target_node(self.target_node)
-
         if next_node is None:
             return None
 
@@ -54,9 +65,7 @@ class Train:
         self.target_node = next_node
         self.running = True
 
-    def check_end_track(self):
-        offset = self.speed/60/2  # 60 fps
-        if ((self.x - offset) <= self.target_node.x <= (self.x + offset)) and ((self.y - offset) <= self.target_node.y <= (self.y + offset)):
-            self.running = False
-        else:
-            self.running = True
+    def check_end_track(self) -> None:
+        offset = self.speed/60/2 # 60 fps
+        distance_to_target = math.hypot(self.target_node.x - self.x, self.target_node.y - self.y)
+        self.running = distance_to_target > offset

@@ -1,34 +1,38 @@
+import pygame
 from random import randint
+from typing import List, Union, Tuple
+from dataclasses import dataclass, field
 
 from classes.node import Node
 from classes.track import Track
 
 
-def connect_tracks(track_one: Track, track_two: Track):
+def connect_tracks(track_one: Track, track_two: Track) -> None:
     track_one.connect_track(track_two)
     track_two.connect_track(track_one)
 
+
+@dataclass
 class TrackController:
-    blueprint_color = (120, 120, 255)
-    tracks = []
+    blueprint_color: Tuple[int, int, int] = (120, 120, 255)
+    tracks: List[Track] = field(default_factory=list)
+    on: bool = False
+    color: Tuple[int, int, int] = (255, 100, 10)
+    first_node: Union[Node, None] = None
+    second_node: Union[Node, None] = None
+    first_select: bool = True
 
-    def __init__(self):
-        self.on = False
-        self.color = (255, 100, 10)
-        self.first_node = None
-        self.second_node = None
-        self.first_select = True
-
-    def draw(self, win):
+    def draw(self, win: pygame.Surface) -> None:
         for track in self.tracks:
             track.draw(win)
 
         if self.first_node is not None:
             self.first_node.draw(win)
+
         if self.second_node is not None:
             self.second_node.draw(win)
 
-    def create_track(self):
+    def create_track(self) -> None:
         if self.first_node is not None and self.second_node is not None:
             self.first_node.color = (200, 50, 50)
             self.second_node.color = (200, 50, 50)
@@ -42,7 +46,7 @@ class TrackController:
         self.first_node = None
         self.second_node = None
 
-    def add_node(self, pos):
+    def add_node(self, pos: Tuple[int, int]) -> None:
         pos = self.snap_pos_to_node(pos)
 
         if self.first_select:
@@ -52,7 +56,7 @@ class TrackController:
 
         self.first_select = not self.first_select
 
-    def remove_node(self, pos):
+    def remove_node(self, pos: Tuple[int, int]) -> None:
         pos = self.snap_pos_to_node(pos)
         to_delete = self.get_tracks_in_position(pos, include_blocked=False)
 
@@ -61,14 +65,13 @@ class TrackController:
 
         self.tracks = [track for track in self.tracks if track not in to_delete]
 
-
-    def snap_pos_to_node(self, pos):
+    def snap_pos_to_node(self, pos: Tuple[int, int]) -> Tuple[int, int]:
         if (node := self.get_first_node_in_position(pos)) is not None:
             return node.get()
 
         return pos
 
-    def get_first_node_in_position(self, pos):
+    def get_first_node_in_position(self, pos: Tuple[int, int]) -> Node | None:
         for track in self.tracks:
             if track.start_node.rect.collidepoint(pos):
                 return track.start_node
@@ -77,7 +80,7 @@ class TrackController:
 
         return None
 
-    def get_nodes_in_position(self, pos):
+    def get_nodes_in_position(self, pos: Tuple[int, int]) -> List[Node]:
         nodes = []
         for track in self.tracks:
             if track.start_node.rect.collidepoint(pos):
@@ -87,5 +90,5 @@ class TrackController:
 
         return nodes
 
-    def get_tracks_in_position(self, *positions, with_out_track=None, include_blocked=True, get_index=False):
+    def get_tracks_in_position(self, *positions: Tuple[int, int], with_out_track: Union[Track, None] = None, include_blocked: bool = True, get_index: bool = False) -> List[int | Track]:
         return [index if get_index else track for index, track in enumerate(self.tracks) if (track is not with_out_track) and (include_blocked or not track.block) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
