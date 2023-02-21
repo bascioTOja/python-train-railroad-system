@@ -6,6 +6,7 @@ class Game:
     size: tuple[int, int]
     fps: int
     run: bool = True
+    pos: tuple[int, int] = (0, 0)
 
     def __post_init__(self):
         self.width = self.size[0]
@@ -22,6 +23,10 @@ class Game:
     def update(self, *args) -> None:
         for item in args:
             item.update(self)
+
+    def hover(self, *args) -> None:
+        for item in args:
+            item.hover(self.pos)
 
     def get_size(self) -> tuple[int, int]:
         return self.width, self.height

@@ -19,6 +19,10 @@ class Track:
         self.start_node.draw(win)
         self.end_node.draw(win)
 
+    def hover(self, pos):
+        self.start_node.hover(pos)
+        self.end_node.hover(pos)
+
     def get_new_target_node(self, current_target: Node) -> Node:
         if current_target.get() == self.start_node.get():
             return self.end_node

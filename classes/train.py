@@ -10,11 +10,13 @@ class Train:
     position: tuple[int, int]
     track: Track
     image: pygame.Surface
-    speed: int = 75
+    speed: int = 80
     color: tuple[int, int, int] = (125, 255, 170)
     not_running_color: tuple[int, int, int] = (255, 0, 0)
+    hover_color: tuple[int, int, int] = (255, 121, 66)
     running: bool = True
 
+    is_hover = False
     angle = 0
     rotation = 0
 
@@ -35,6 +37,19 @@ class Train:
         else:
             self.set_next_track()
 
+    def hover(self, pos):
+        self.is_hover = self.rect.collidepoint(pos)
+
+    def draw(self, win: pygame.Surface) -> None:
+        color = self.color if self.running else self.not_running_color
+
+        pygame.draw.circle(win, self.hover_color if self.is_hover else color, self.rect.center, self.width//2)
+        win.blit(self.rotated_image, self.rect)
+
+    def delete(self):
+        self.track.block = False
+        del self
+
     def update_position(self, game: Game | None):
         self.angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
         delta_time = game.fps if game is not None else 60
@@ -45,10 +60,6 @@ class Train:
         self.rotation = math.degrees(-self.angle) - 90
         self.rotated_image = pygame.transform.rotate(self.image, self.rotation)
         self.rect = self.rotated_image.get_rect(center=(self.x, self.y))
-
-    def draw(self, win: pygame.Surface) -> None:
-        pygame.draw.circle(win, self.color if self.running else self.not_running_color, self.rect.center, self.width//2)
-        win.blit(self.rotated_image, self.rect)
 
     def set_next_track(self) -> None:
         next_track = self.track.get_next_track(self.target_node)

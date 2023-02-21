@@ -5,6 +5,8 @@ from classes.node import Node
 from classes.track import Track
 from classes.train import Train
 from classes.track_controller import TrackController
+from classes.train_controller import TrainController
+
 
 def main():
     game = Game(size=(800, 600), fps=60)
@@ -14,7 +16,7 @@ def main():
 
     track = Track((100, 255, 100), Node(400, 400), Node(200, 400))
 
-    train = Train(track.start_node.get(), track, image)
+    train = Train(track.start_node.get(), track, image, speed=120)
 
     track2 = Track((255, 100, 100), Node(200, 200), Node(200, 100))
     train2 = Train(track2.start_node.get(), track2, image)
@@ -45,23 +47,25 @@ def main():
     train4 = Train(track4.start_node.get(), track4, image)
 
     track_controller.tracks.extend([track, track2, track3, track4, track5, track6, track7])
-    trains = [train, train2, train3, train4]
+    train_controller = TrainController([train, train2, train3, train4])
 
     while game.run:
+        game.pos = pygame.mouse.get_pos()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.run = False
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    pos = pygame.mouse.get_pos()
-                    track_controller.add_node(pos)
+                    track_controller.add_node(game.pos)
                 elif event.button == 3:
-                    pos = pygame.mouse.get_pos()
-                    track_controller.remove_node(pos)
+                    track_controller.remove_node(game.pos)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     track_controller.create_track()
+                if event.key == pygame.K_q:
+                    train_controller.remove_train(game.pos)
             # elif event.type == pygame.MOUSEBUTTONUP:
             #     if event.button == 1:
             #         selected_point = None
@@ -75,8 +79,9 @@ def main():
             #         selected_point.x, selected_point.y = pos
             #         selected_point.rect.x, selected_point.rect.y = selected_point.x - selected_point.size // 2, selected_point.y - selected_point.size // 2
 
-        game.update(*trains)
-        game.draw(track_controller, *trains)
+        game.update(train_controller)
+        game.hover(train_controller, track_controller)
+        game.draw(track_controller, train_controller)
         game.clock.tick(game.fps)
 
 pygame.quit()

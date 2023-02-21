@@ -32,6 +32,10 @@ class TrackController:
         if self.second_node is not None:
             self.second_node.draw(win)
 
+    def hover(self, pos):
+        for track in self.tracks:
+            track.hover(pos)
+
     def create_track(self) -> None:
         if self.first_node is not None and self.second_node is not None:
             self.first_node.color = (200, 50, 50)
