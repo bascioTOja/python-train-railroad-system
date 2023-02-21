@@ -66,6 +66,9 @@ def main():
                     track_controller.create_track()
                 if event.key == pygame.K_q:
                     train_controller.remove_train(game.pos)
+                if event.key == pygame.K_e:
+                    if (selected_track := track_controller.get_first_track_in_position(game.pos)) is not None:
+                        train_controller.add_train(selected_track, game.pos, image)
             # elif event.type == pygame.MOUSEBUTTONUP:
             #     if event.button == 1:
             #         selected_point = None

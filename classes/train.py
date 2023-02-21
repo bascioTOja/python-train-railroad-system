@@ -2,6 +2,7 @@ import pygame
 import math
 from dataclasses import dataclass
 
+from classes.node import Node
 from classes.track import Track
 from classes.game import Game
 
@@ -10,11 +11,12 @@ class Train:
     position: tuple[int, int]
     track: Track
     image: pygame.Surface
+    target_node: Node | None = None
     speed: int = 80
     color: tuple[int, int, int] = (125, 255, 170)
     not_running_color: tuple[int, int, int] = (255, 0, 0)
     hover_color: tuple[int, int, int] = (255, 121, 66)
-    running: bool = True
+    running: bool = False
 
     is_hover = False
     angle = 0
@@ -23,7 +25,7 @@ class Train:
     def __post_init__(self):
         self.x, self.y = self.position
         self.width, self.height = self.image.get_size()
-        self.target_node = self.track.end_node
+        self.target_node = self.target_node or self.track.end_node
 
         self.update_position(None)
         self.update_rotation()

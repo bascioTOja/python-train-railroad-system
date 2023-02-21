@@ -94,5 +94,8 @@ class TrackController:
 
         return nodes
 
+    def get_first_track_in_position(self, pos: Tuple[int, int]) -> Track | None:
+        return next((track for track in self.tracks if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)), None)
+
     def get_tracks_in_position(self, *positions: Tuple[int, int], with_out_track: Union[Track, None] = None, include_blocked: bool = True, get_index: bool = False) -> List[int | Track]:
         return [index if get_index else track for index, track in enumerate(self.tracks) if (track is not with_out_track) and (include_blocked or not track.block) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
