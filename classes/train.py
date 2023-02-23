@@ -1,4 +1,4 @@
-import pygame
+from pygame import Surface, draw, transform
 import math
 from dataclasses import dataclass
 
@@ -41,28 +41,28 @@ class Train:
         else:
             self.set_next_track()
 
-    def hover(self, pos):
+    def hover(self, pos: tuple[int, int]) -> None:
         self.is_hover = self.rect.collidepoint(pos)
 
-    def draw(self, win: pygame.Surface) -> None:
+    def draw(self, win: Surface) -> None:
         color = self.color if self.running else self.not_running_color
 
-        pygame.draw.circle(win, self.hover_color if self.is_hover else color, self.rect.center, self.width//2)
+        draw.circle(win, self.hover_color if self.is_hover else color, self.rect.center, self.width//2)
         win.blit(self.rotated_image, self.rect)
 
-    def delete(self):
+    def delete(self) -> None:
         self.track.block = False
         del self
 
-    def update_position(self, game):
+    def update_position(self, game) -> None:
         self.angle = math.atan2(self.target_node.y - self.y, self.target_node.x - self.x)
         delta_time = game.fps if game is not None else 60
         self.x += math.cos(self.angle) / delta_time * self.type.speed
         self.y += math.sin(self.angle) / delta_time * self.type.speed
 
-    def update_rotation(self):
+    def update_rotation(self) -> None:
         self.rotation = math.degrees(-self.angle) - 90
-        self.rotated_image = pygame.transform.rotate(self.type.image, self.rotation)
+        self.rotated_image = transform.rotate(self.type.image, self.rotation)
         self.rect = self.rotated_image.get_rect(center=(self.x, self.y))
 
     def set_next_track(self) -> None:

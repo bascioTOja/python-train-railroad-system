@@ -1,4 +1,4 @@
-import pygame
+from pygame import Surface, draw
 from random import choice
 from typing import List, Union
 from dataclasses import dataclass, field
@@ -14,12 +14,12 @@ class Track:
     connected_with_start: List['Track'] = field(default_factory=list)
     block: bool = False
 
-    def draw(self, win: pygame.Surface) -> None:
-        pygame.draw.line(win, self.color, self.start_node.get(), self.end_node.get(), 2)
+    def draw(self, win: Surface) -> None:
+        draw.line(win, self.color, self.start_node.get(), self.end_node.get(), 2)
         self.start_node.draw(win)
         self.end_node.draw(win)
 
-    def hover(self, pos):
+    def hover(self, pos: tuple[int, int]):
         self.start_node.hover(pos)
         self.end_node.hover(pos)
 

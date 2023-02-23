@@ -25,7 +25,7 @@ class Game:
         self.track_controller.tracks.extend(tracks)
         self.train_controller = TrainController(trains)
 
-    def events(self):
+    def events(self) -> None:
         self.pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
@@ -68,16 +68,16 @@ class Game:
     def get_size(self) -> tuple[int, int]:
         return self.width, self.height
 
-    def quit(self):
+    def quit(self) -> None:
         self.run = False
 
-    def mouse_button_up_events(self, event):
+    def mouse_button_up_events(self, event) -> None:
         if event.button == 1:
             self.track_controller.add_node(self.pos)
         elif event.button == 3:
             self.track_controller.remove_node(self.pos)
 
-    def keydown_events(self, event):
+    def keydown_events(self, event) -> None:
         if event.key == pygame.K_SPACE:
             self.track_controller.create_track()
         if event.key == pygame.K_q:
@@ -85,4 +85,3 @@ class Game:
         if event.key == pygame.K_e:
             if (selected_track := self.track_controller.get_first_track_in_position(self.pos)) is not None:
                 self.train_controller.add_train(TrainType.CLASSIC, selected_track, self.pos)
-

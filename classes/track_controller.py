@@ -1,4 +1,4 @@
-import pygame
+from pygame import Surface
 from random import randint
 from typing import List, Union, Tuple
 from dataclasses import dataclass, field
@@ -22,7 +22,7 @@ class TrackController:
     second_node: Union[Node, None] = None
     first_select: bool = True
 
-    def draw(self, win: pygame.Surface) -> None:
+    def draw(self, win: Surface) -> None:
         for track in self.tracks:
             track.draw(win)
 
@@ -32,7 +32,7 @@ class TrackController:
         if self.second_node is not None:
             self.second_node.draw(win)
 
-    def hover(self, pos):
+    def hover(self, pos: tuple[int, int]) -> None:
         for track in self.tracks:
             track.hover(pos)
 
@@ -41,7 +41,7 @@ class TrackController:
             self.first_node.color = (200, 50, 50)
             self.second_node.color = (200, 50, 50)
 
-            new_track = Track((randint(20, 255), randint(20, 255), randint(20, 255)), self.first_node, self.second_node)
+            new_track = Track((randint(40, 170), randint(40, 170), randint(40, 170)), self.first_node, self.second_node)
             self.tracks.append(new_track)
 
             for track in self.get_tracks_in_position(new_track.start_node.get(), new_track.end_node.get(), with_out_track=new_track):
