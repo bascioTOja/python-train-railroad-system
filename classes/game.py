@@ -1,6 +1,10 @@
 import pygame
 from dataclasses import dataclass
 
+from classes import helpers
+from classes.track_controller import TrackController
+from classes.train_controller import TrainController
+
 @dataclass
 class Game:
     size: tuple[int, int]
@@ -13,6 +17,13 @@ class Game:
         self.height = self.size[1]
         self.win = pygame.display.set_mode(self.get_size())
         self.clock = pygame.time.Clock()
+
+        self.track_controller = TrackController()
+
+
+        tracks, trains = helpers.create_tracks_and_trains()
+        self.track_controller.tracks.extend(tracks)
+        self.train_controller = TrainController(trains)
 
     def draw(self, *args) -> None:
         self.win.fill((0, 0, 0))

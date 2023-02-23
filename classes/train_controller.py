@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 
 from classes.track import Track
 from classes.train import Train
+from enums.train_type import TrainType
+
 
 @dataclass
 class TrainController:
@@ -25,8 +27,8 @@ class TrainController:
             self.trains.remove(train)
             train.delete()
 
-    def add_train(self, track: Track, pos: Tuple[int, int], image):
-        self.trains.append(Train(pos, track, image, track.start_node if track.start_node.rect.collidepoint(pos) else track.end_node))
+    def add_train(self, train_type: TrainType, track: Track, pos: Tuple[int, int]):
+        self.trains.append(Train(train_type, pos, track, track.start_node if track.start_node.rect.collidepoint(pos) else track.end_node))
 
     def get_first_train_in_position(self, pos: Tuple[int, int]) -> Train | None:
         return next((train for train in self.trains if train.rect.collidepoint(pos)), None)
