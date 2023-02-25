@@ -8,6 +8,9 @@ from classes.track import Track
 
 
 def connect_tracks(track_one: Track, track_two: Track) -> None:
+    if track_one is track_two:
+        return
+
     track_one.connect_track(track_two)
     track_two.connect_track(track_one)
 
@@ -62,7 +65,7 @@ class TrackController:
 
     def remove_node(self, pos: Tuple[int, int]) -> None:
         pos = self.snap_pos_to_node(pos)
-        to_delete = self.get_tracks_in_position(pos, include_blocked=False)
+        to_delete = self.get_tracks_in_position(pos, with_blocked=False)
 
         for track in to_delete:
             track.delete()
@@ -70,13 +73,16 @@ class TrackController:
         self.tracks = [track for track in self.tracks if track not in to_delete]
 
     def snap_pos_to_node(self, pos: Tuple[int, int]) -> Tuple[int, int]:
-        if (node := self.get_first_node_in_position(pos)) is not None:
+        if (node := self.get_first_node_in_position(pos, with_blocked=True)) is not None:
             return node.get()
 
         return pos
 
-    def get_first_node_in_position(self, pos: Tuple[int, int]) -> Node | None:
+    def get_first_node_in_position(self, pos: Tuple[int, int], with_blocked: bool = False) -> Node | None:
         for track in self.tracks:
+            if not with_blocked and track.block:
+                continue
+
             if track.start_node.rect.collidepoint(pos):
                 return track.start_node
             if track.end_node.rect.collidepoint(pos):
@@ -84,18 +90,32 @@ class TrackController:
 
         return None
 
-    def get_nodes_in_position(self, pos: Tuple[int, int]) -> List[Node]:
+    def get_nodes_in_position(self, pos: Tuple[int, int], with_blocked: bool = False, all_must_by_unlock: bool = False) -> List[Node]:
         nodes = []
         for track in self.tracks:
+            if (not with_blocked and not all_must_by_unlock) and track.block:
+                continue
             if track.start_node.rect.collidepoint(pos):
+                if all_must_by_unlock and track.block:
+                    return []
                 nodes.append(track.start_node)
             elif track.end_node.rect.collidepoint(pos):
+                if all_must_by_unlock and track.block:
+                    return []
                 nodes.append(track.end_node)
 
         return nodes
 
-    def get_first_track_in_position(self, pos: Tuple[int, int]) -> Track | None:
-        return next((track for track in self.tracks if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)), None)
+    def get_first_track_in_position(self, pos: Tuple[int, int], with_blocked: bool = False) -> Track | None:
+        return next((track for track in self.tracks if (with_blocked or not track.block) and (track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos))), None)
 
-    def get_tracks_in_position(self, *positions: Tuple[int, int], with_out_track: Union[Track, None] = None, include_blocked: bool = True, get_index: bool = False) -> List[int | Track]:
-        return [index if get_index else track for index, track in enumerate(self.tracks) if (track is not with_out_track) and (include_blocked or not track.block) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
+    def get_tracks_in_position(self, *positions: Tuple[int, int], with_out_track: Union[Track, None] = None, with_blocked: bool = True, get_index: bool = False) -> List[int | Track]:
+        return [index if get_index else track for index, track in enumerate(self.tracks) if (track is not with_out_track) and (with_blocked or not track.block) and len([pos for pos in positions if track.start_node.rect.collidepoint(pos) or track.end_node.rect.collidepoint(pos)])]
+
+    def put_holding_track(self, track, pos):
+        node = track.get_node_by_pos(pos)
+        pos = self.snap_pos_to_node(pos)
+        node.move(pos)
+        for track_to_connect in self.get_tracks_in_position(pos, with_out_track=track):
+            connect_tracks(track, track_to_connect)
+

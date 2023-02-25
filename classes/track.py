@@ -14,6 +14,10 @@ class Track:
     connected_with_start: List['Track'] = field(default_factory=list)
     block: bool = False
 
+    def __post_init__(self):
+        self.start_node.set_track(self)
+        self.end_node.set_track(self)
+
     def draw(self, win: Surface) -> None:
         draw.line(win, self.color, self.start_node.get(), self.end_node.get(), 2)
         self.start_node.draw(win)
@@ -45,7 +49,25 @@ class Track:
         for track in self.connected_with_end:
             track.disconnect_track(self)
 
+    def get_node_by_pos(self, pos) -> None | Node:
+        if self.start_node.is_in_pos(pos):
+            return  self.start_node
+
+        return self.end_node if self.end_node.is_in_pos(pos) else None
+
+    def get_connections_by_node(self, node: Node):
+        if node is self.start_node:
+            return self.connected_with_start
+
+        return self.connected_with_end if node is self.end_node else []
+
     def connect_track(self, track: 'Track') -> None:
+        if self is Track:
+            return
+
+        if track in self.connected_with_start or track in self.connected_with_end:
+            return
+
         if self.start_node.get() == track.start_node.get():
             self.connect_with_start(track)
 
@@ -62,8 +84,29 @@ class Track:
         self.connected_with_start = [connected_track for connected_track in self.connected_with_start if connected_track is not track]
         self.connected_with_end = [connected_track for connected_track in self.connected_with_end if connected_track is not track]
 
+    def disconnect_self_by_node(self, node: Node) -> None:
+        if node is self.start_node:
+            self.disconnect_self_start()
+        elif node is self.end_node:
+            self.disconnect_self_end()
+
+    def disconnect_self_start(self) -> None:
+        for track in self.connected_with_start:
+            track.disconnect_track(self)
+
+        self.connected_with_start = []
+
+    def disconnect_self_end(self) -> None:
+        for track in self.connected_with_end:
+            track.disconnect_track(self)
+
+        self.connected_with_end = []
+
     def connect_with_start(self, track: 'Track') -> None:
         self.connected_with_start.append(track)
 
     def connect_with_end(self, track: 'Track') -> None:
         self.connected_with_end.append(track)
+
+    def set_block(self, block: bool = True) -> None:
+        self.block = block
