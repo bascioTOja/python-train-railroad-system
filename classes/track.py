@@ -4,12 +4,16 @@ from typing import List, Union
 from dataclasses import dataclass, field
 
 from classes.node import Node
+from enums.rotate import Rotate
 
 @dataclass
 class Track:
     color: tuple[int, int, int]
     start_node: Node
     end_node: Node
+    coords: (int, int) = None
+    rotate: Rotate = None
+    image: Surface|None = None
     connected_with_end: List['Track'] = field(default_factory=list)
     connected_with_start: List['Track'] = field(default_factory=list)
     block: bool = False
@@ -19,6 +23,9 @@ class Track:
         self.end_node.set_track(self)
 
     def draw(self, win: Surface) -> None:
+        if self.image and self.coords:
+            win.blit(self.image, self.coords)
+
         draw.line(win, self.color, self.start_node.get(), self.end_node.get(), 2)
         self.start_node.draw(win)
         self.end_node.draw(win)

@@ -45,13 +45,18 @@ class TrackController:
             self.second_node.color = (200, 50, 50)
 
             new_track = Track((randint(40, 170), randint(40, 170), randint(40, 170)), self.first_node, self.second_node)
-            self.tracks.append(new_track)
-
-            for track in self.get_tracks_in_position(new_track.start_node.get(), new_track.end_node.get(), with_out_track=new_track):
-                connect_tracks(track, new_track)
+            self.append_track(new_track)
 
         self.first_node = None
         self.second_node = None
+
+    def append_track(self, track: Track) -> None:
+        self.tracks.append(track)
+        self.connect_tracks_with_new(track)
+
+    def connect_tracks_with_new(self, new_track: Track) -> None:
+        for track in self.get_tracks_in_position(new_track.start_node.get(), new_track.end_node.get(), with_out_track=new_track):
+            connect_tracks(track, new_track)
 
     def add_node(self, pos: Tuple[int, int]) -> None:
         pos = self.snap_pos_to_node(pos)

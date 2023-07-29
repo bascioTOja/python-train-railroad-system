@@ -14,7 +14,8 @@ class Game:
     run: bool = True
     pos: tuple[int, int] = (0, 0)
     grid_size: int = 32
-    grid_mode: bool = False
+    grid_mode: bool = True
+    node_editor: bool = True
 
     def __post_init__(self):
         self.width = self.size[0]
